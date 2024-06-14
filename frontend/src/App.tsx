@@ -15,7 +15,8 @@ function App() {
   useEffect(() => {
     const ws = new WebSocket("http://localhost:3000/ws/cachefeed");
     ws.onmessage = (e) => {
-      console.log(e.data);
+      const data = JSON.parse(e.data);
+      setCache(data);
     };
 
     return () => ws.close();
@@ -37,15 +38,12 @@ function App() {
         },
       });
       const json = await res.json();
-      console.log(json);
       if (json.ok) {
         setReqBody({
           key: "",
           value: "",
           ttl: "",
         });
-
-        await getSnapshot();
       }
     } catch (error) {
       console.log(error);
@@ -57,7 +55,6 @@ function App() {
       const key = reqBody.key;
       const res = await fetch(`http://localhost:3000/${key}`);
       const json = await res.json();
-      console.log(json);
       if (json.ok) {
         setReqBody({
           key: "",
@@ -77,15 +74,12 @@ function App() {
         method: "DELETE",
       });
       const json = await res.json();
-      console.log(json);
       if (json.ok) {
         setReqBody({
           key: "",
           value: "",
           ttl: "",
         });
-
-        await getSnapshot();
       }
     } catch (error) {
       console.error(error);
@@ -142,7 +136,7 @@ function App() {
                   value={reqBody.ttl}
                   name="ttl"
                   onChange={(e) => handleFormChange(e.target)}
-                  placeholder="Time to leave"
+                  placeholder="Time to live"
                 />
                 <button onClick={() => handlePut()}>Put</button>
               </div>

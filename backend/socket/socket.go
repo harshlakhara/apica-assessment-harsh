@@ -1,50 +1,50 @@
 package socket
 
 import (
-	"fmt"
-	"io"
+	"encoding/json"
+	"log"
 
-	"golang.org/x/net/websocket"
+	"github.com/gofiber/contrib/websocket"
 )
 
-type WebSocketServer struct {
-	conns map[*websocket.Conn]bool
+type messageType struct {
+	Content string `json:"content"`
 }
 
-func NewSocketServer() *WebSocketServer {
-	return &WebSocketServer{
-		conns: make(map[*websocket.Conn]bool),
-	}
+var clients = make(map[*websocket.Conn]*client) // Map to store connected clients
+
+type client struct {
+	conn *websocket.Conn
 }
 
-func (s *WebSocketServer) HandleWS(ws *websocket.Conn) {
-	fmt.Println("Incoming connection from: ", ws.RemoteAddr())
+func WSHandler(c *websocket.Conn) {
+	defer func() {
+		delete(clients, c)
+	}()
 
-	s.conns[ws] = true
-
-	s.readLoop(ws)
-}
-
-func (s *WebSocketServer) readLoop(ws *websocket.Conn) {
-	buff := make([]byte, 1024)
+	clients[c] = &client{conn: c}
 
 	for {
-		n, err := ws.Read(buff)
+		_, message, err := c.ReadMessage()
 		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			fmt.Println("Error reading message: ", err)
+			log.Println("read error:", err)
+			break
+		}
+
+		var msg messageType
+		if err := json.Unmarshal(message, &msg); err != nil {
+			log.Println("unmarshal error:", err)
 			continue
 		}
-		msg := buff[:n]
-
-		fmt.Println(msg, " <--- received from ", ws.RemoteAddr())
 	}
 }
 
-func (s *WebSocketServer) Broadcast(b []byte) {
-	for conn := range s.conns {
-		go conn.Write(b)
+func Broadcast(msg interface{}) {
+	for client := range clients {
+		if err := client.Conn.WriteJSON(msg); err != nil {
+			log.Println("write error:", err)
+			delete(clients, client)
+			client.Conn.Close()
+		}
 	}
 }

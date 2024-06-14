@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"lru-cache/socket"
 	"time"
 )
 
@@ -12,6 +13,7 @@ func (cache *LRUCache) startCleaner() {
 		select {
 		case <-ticker.C:
 			cache.removeExpiredItems()
+			// socket.Broadcast(cache.Snapshot())
 		case <-cache.stopCh:
 			return
 		}
@@ -28,6 +30,7 @@ func (cache *LRUCache) removeExpiredItems() {
 		if now.Sub(entry.value.timestamp) > entry.value.ttl {
 			cache.order.Remove(e)
 			delete(cache.items, entry.key)
+			socket.Broadcast(cache.Snapshot())
 		} else {
 			break
 		}
@@ -42,6 +45,7 @@ func (cache *LRUCache) Set(key string, value interface{}, ttl time.Duration) {
 		cache.order.MoveToFront(element)
 		element.Value.(*CacheEntry).value.value = value
 		element.Value.(*CacheEntry).value.timestamp = time.Now()
+		socket.Broadcast(cache.Snapshot())
 		return
 	}
 
@@ -50,6 +54,7 @@ func (cache *LRUCache) Set(key string, value interface{}, ttl time.Duration) {
 		if oldest != nil {
 			cache.order.Remove(oldest)
 			delete(cache.items, oldest.Value.(*CacheEntry).key)
+			socket.Broadcast(cache.Snapshot())
 		}
 	}
 
@@ -66,6 +71,7 @@ func (cache *LRUCache) Set(key string, value interface{}, ttl time.Duration) {
 
 	element := cache.order.PushFront(entry)
 	cache.items[key] = element
+	socket.Broadcast(cache.Snapshot())
 }
 
 func (cache *LRUCache) Get(key string) (interface{}, bool) {
@@ -81,6 +87,7 @@ func (cache *LRUCache) Get(key string) (interface{}, bool) {
 		}
 		cache.order.MoveToFront(element)
 		item.timestamp = time.Now()
+		socket.Broadcast(cache.Snapshot())
 		return item.value, true
 	}
 	return nil, false
@@ -94,6 +101,7 @@ func (cache *LRUCache) Delete(key string) bool {
 	if found {
 		cache.order.Remove(element)
 		delete(cache.items, key)
+		socket.Broadcast(cache.Snapshot())
 	}
 	return found
 }
@@ -112,6 +120,7 @@ func (cache *LRUCache) Clear() {
 		e = next
 	}
 
+	socket.Broadcast(cache.Snapshot())
 	cache.Stop()
 }
 
