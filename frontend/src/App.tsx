@@ -135,8 +135,9 @@ function App() {
                   type="number"
                   value={reqBody.ttl}
                   name="ttl"
+                  min={0}
                   onChange={(e) => handleFormChange(e.target)}
-                  placeholder="Time to live"
+                  placeholder="Time to live in seconds"
                 />
                 <button onClick={() => handlePut()}>Put</button>
               </div>
@@ -166,7 +167,7 @@ function App() {
           </div>
         </div>
         <div className="insights">
-          <h2>Insights</h2>
+          <h2>Current State</h2>
           <div className="cache-visualisation">
             {cache.map((ele: any) => (
               <>
