@@ -1,20 +1,19 @@
 package main
 
 import (
-	"lru-cache/socket"
-	"net/http"
+	"lru-cache/server"
 
-	"golang.org/x/net/websocket"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
-	// 	cache := cache.NewLRUCache(3, 5)
-	// 	cache.Set("0", 0)
-	// 	cache.Set("1", 1)
-	// 	fmt.Println(cache.Get("0"))
-	// 	time.Sleep(time.Second * 10)
-	// 	fmt.Println(cache.Get("0"))
-	server := socket.NewSocketServer()
-	http.Handle("/ws", websocket.Handler(server.HandleWS))
-	http.ListenAndServe(":3000", nil)
+	app := fiber.New()
+	app.Use(cors.New())
+	app.Post("/", server.PutCache)
+	app.Get("/snapshot", server.GetSnapshot)
+	app.Delete("/clear", server.ClearCache)
+	app.Get("/:key", server.GetCache)
+	app.Delete("/:key", server.DeleteCache)
+	app.Listen(":3000")
 }

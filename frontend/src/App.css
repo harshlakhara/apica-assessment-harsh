@@ -1,0 +1,111 @@
+.layout-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  height: 100%;
+}
+.toolbar {
+  background-color: antiquewhite;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.insights {
+  padding: 20px;
+}
+.dropdown-wrapper {
+  position: relative;
+}
+.dropdown-wrapper .dropdown-toggle {
+  border: 1px solid brown;
+  padding: 10px;
+}
+.dropdown-wrapper .dropdown-body {
+  display: none;
+  position: absolute;
+  padding-top: 5px;
+}
+.dropdown-wrapper:hover .dropdown-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  width: 100%;
+  background-color: antiquewhite;
+}
+.dropdown-wrapper:hover .dropdown-body .dropdown-options {
+  border: 1px solid brown;
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+  background-color: bisque;
+}
+
+.dropdown-wrapper:hover .dropdown-body .dropdown-options:hover {
+  border: 1px solid rgb(0, 0, 0);
+  background-color: wheat;
+}
+.form {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.form input,
+.form button {
+  width: 100%;
+  padding: 10px;
+  outline: none;
+  border: 1px solid brown;
+  background-color: antiquewhite;
+}
+
+.form button {
+  cursor: pointer;
+}
+.form button:hover {
+  background-color: brown;
+  color: white;
+}
+.cache-visualisation {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  overflow: auto;
+  padding: 20px;
+}
+
+.cache-visualisation .cache-block {
+  background-color: cadetblue;
+  height: 50px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  overflow: hidden;
+  height: 100%;
+  width: 300px;
+}
+
+.cache-visualisation .cache-block .key {
+  background-color: brown;
+  width: 100%;
+  padding: 20px;
+}
+.cache-visualisation .cache-block .value {
+  width: 100%;
+  padding: 20px;
+}
+.cache-visualisation .cache-block .ttl {
+  width: 100%;
+  grid-column: span 2;
+  padding: 20px;
+}

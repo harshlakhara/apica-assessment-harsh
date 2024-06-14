@@ -1,9 +1,11 @@
 package cache
 
-import "time"
+import (
+	"time"
+)
 
 func (cache *LRUCache) startCleaner() {
-	ticker := time.NewTicker(cache.ttl / 2)
+	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
 	for {
@@ -32,7 +34,7 @@ func (cache *LRUCache) removeExpiredItems() {
 	}
 }
 
-func (cache *LRUCache) Set(key string, value interface{}) {
+func (cache *LRUCache) Set(key string, value interface{}, ttl time.Duration) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -54,7 +56,7 @@ func (cache *LRUCache) Set(key string, value interface{}) {
 	newItem := &CacheItem{
 		value:     value,
 		timestamp: time.Now(),
-		ttl:       cache.ttl,
+		ttl:       ttl,
 	}
 
 	entry := &CacheEntry{
@@ -84,14 +86,45 @@ func (cache *LRUCache) Get(key string) (interface{}, bool) {
 	return nil, false
 }
 
-func (cache *LRUCache) Delete(key string) {
+func (cache *LRUCache) Delete(key string) bool {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	if element, found := cache.items[key]; found {
+	element, found := cache.items[key]
+	if found {
 		cache.order.Remove(element)
 		delete(cache.items, key)
 	}
+	return found
+}
+
+func (cache *LRUCache) Clear() {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	for k := range cache.items {
+		delete(cache.items, k)
+	}
+
+	for e := cache.order.Front(); e != nil; {
+		next := e.Next()
+		cache.order.Remove(e)
+		e = next
+	}
+
+	cache.Stop()
+}
+
+func (cache *LRUCache) Snapshot() []interface{} {
+	res := make([]interface{}, 0, len(cache.items))
+	for e := cache.order.Front(); e != nil; e = e.Next() {
+		value := make(map[string]interface{})
+		value["key"] = e.Value.(*CacheEntry).key
+		value["value"] = e.Value.(*CacheEntry).value.value
+		value["ttl"] = e.Value.(*CacheEntry).value.ttl.Seconds()
+		res = append(res, value)
+	}
+	return res
 }
 
 func (cache *LRUCache) Stop() {
