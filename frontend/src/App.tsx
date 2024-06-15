@@ -12,6 +12,7 @@ function App() {
   const [reqBody, setReqBody] = useState({ key: "", value: "", ttl: "" });
   const [cache, setCache] = useState<{ [k: string]: any }[]>([]);
   const [dropdownOpen, setOpendrown] = useState(false);
+  const [getValue, setGetValue] = useState("");
 
   useEffect(() => {
     const ws = new WebSocket("http://localhost:3000/ws/cachefeed");
@@ -19,6 +20,8 @@ function App() {
       const data = JSON.parse(e.data);
       setCache(data);
     };
+
+    getSnapshot();
 
     return () => ws.close();
   }, []);
@@ -57,6 +60,10 @@ function App() {
       const res = await fetch(`http://localhost:3000/${key}`);
       const json = await res.json();
       if (json.ok) {
+        setGetValue(key);
+        setTimeout(() => {
+          setGetValue("");
+        }, 1000);
         setReqBody({
           key: "",
           value: "",
@@ -95,6 +102,16 @@ function App() {
       setOpendrown(false);
     }
   });
+
+  const getSnapshot = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/snapshot`);
+      const json = await res.json();
+      setCache(json);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -181,11 +198,15 @@ function App() {
           </div>
         </div>
         <div className="insights">
-          <h2>Current State</h2>
+          <h2>Current State | With Capacity 5</h2>
           <div className="cache-visualisation">
             {cache.map((ele: any) => (
               <>
-                <div className="cache-block">
+                <div
+                  className={`cache-block ${
+                    getValue === ele.key ? "highlight" : ""
+                  }`}
+                >
                   <div className="key">Key: {ele.key}</div>
                   <div className="value">Value: {ele.value}</div>
                   <div className="ttl">TTL: {ele.ttl}</div>
