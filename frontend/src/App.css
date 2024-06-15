@@ -102,9 +102,11 @@
   overflow: hidden;
   height: 100%;
   width: 300px;
+  transition: all 300ms ease-in-out;
 }
 .cache-visualisation .cache-block.highlight {
   border: 3px solid red;
+  transform: scale(1.2);
 }
 
 .cache-visualisation .cache-block .key {
