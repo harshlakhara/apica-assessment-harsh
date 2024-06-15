@@ -11,6 +11,7 @@ function App() {
   const [method, setMethod] = useState("put");
   const [reqBody, setReqBody] = useState({ key: "", value: "", ttl: "" });
   const [cache, setCache] = useState<{ [k: string]: any }[]>([]);
+  const [dropdownOpen, setOpendrown] = useState(false);
 
   useEffect(() => {
     const ws = new WebSocket("http://localhost:3000/ws/cachefeed");
@@ -86,29 +87,42 @@ function App() {
     }
   };
 
-  const getSnapshot = async () => {
-    try {
-      const res = await fetch(`http://localhost:3000/snapshot`);
-      const json = await res.json();
-      setCache(json);
-    } catch (error) {
-      console.error(error);
+  document.addEventListener("mousedown", (e) => {
+    if (
+      dropdownOpen &&
+      !(e.target as HTMLDivElement).classList.contains("dropdown-options")
+    ) {
+      setOpendrown(false);
     }
-  };
+  });
+
   return (
     <>
       <div className="layout-wrapper">
         <div className="toolbar">
           <h2>Toolbar</h2>
           <div className="input-section">
-            <div className="dropdown-wrapper">
-              <div className="dropdown-toggle">{METHODS[method]}</div>
+            <div className={`dropdown-wrapper ${dropdownOpen ? "show" : ""}`}>
+              <div
+                className="dropdown-toggle"
+                onClick={() => {
+                  setOpendrown(true);
+                }}
+              >
+                <span>{METHODS[method]} </span>
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAvklEQVR4nO3RwQqDMBCE4aGHYt92j75XD7ZPZxEUSsCmarKZ1flhbznMRwCllFJKKeXZDSfYeAfwBNCDNwPwAvDIIcb5elLEON97DZNC2DCWbJsg3dpjVoxtQbBibA+CDWNHECwYK4FojbGSiFYYq4HwxlhNhBfGBVEb44qohWmCKI1piiiFoUAcxVAh9mIoEVsx1Ih/MSEQOUwoxNI0cEiGf98QAfHrZ8L8RA4TEpFiQiOWujMglFJKKaWu3AfcdLEudXvTswAAAABJRU5ErkJggg=="></img>
+              </div>
               <div className="dropdown-body">
                 {Object.entries(METHODS).map(([k, v]) => (
                   <div
                     key={k}
-                    onClick={() => setMethod(k)}
-                    className="dropdown-options"
+                    onClick={() => {
+                      setMethod(k);
+                      setOpendrown(false);
+                    }}
+                    className={`dropdown-options ${
+                      method == k ? "active" : ""
+                    }`}
                   >
                     {v}
                   </div>
