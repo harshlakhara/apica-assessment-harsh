@@ -209,9 +209,11 @@ function App() {
           </div>
         </div>
         <div className="insights">
-          <h2>Current State | With Capacity 5</h2>
-          <div>
-            <button onClick={clearCache}>Clear Cache</button>
+          <div className="header">
+            <h2>Current State | With Capacity 5</h2>
+            <button className="btn clearcache" onClick={clearCache}>
+              <span>&times; </span>Clear Cache
+            </button>
           </div>
           <div className="cache-visualisation">
             {cache.map((ele: any) => (

@@ -75,6 +75,28 @@
   border: 1px solid brown;
   background-color: antiquewhite;
 }
+.btn {
+  padding: 10px;
+}
+.btn.clearcache {
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background-color: transparent;
+  outline: none;
+  border: 1px solid brown;
+  cursor: pointer;
+}
+.btn.btn.clearcache:hover {
+  background-color: brown;
+  color: white;
+}
+.btn.clearcache span {
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+}
 
 .form button {
   cursor: pointer;
@@ -82,6 +104,11 @@
 .form button:hover {
   background-color: brown;
   color: white;
+}
+.insights .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .cache-visualisation {
   display: flex;
