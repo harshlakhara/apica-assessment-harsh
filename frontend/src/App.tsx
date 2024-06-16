@@ -113,6 +113,17 @@ function App() {
     }
   };
 
+  const clearCache = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/clear`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <div className="layout-wrapper">
@@ -199,6 +210,9 @@ function App() {
         </div>
         <div className="insights">
           <h2>Current State | With Capacity 5</h2>
+          <div>
+            <button onClick={clearCache}>Clear Cache</button>
+          </div>
           <div className="cache-visualisation">
             {cache.map((ele: any) => (
               <>
